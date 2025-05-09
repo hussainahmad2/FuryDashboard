@@ -1,0 +1,47 @@
+name: fury_dash
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  fl_chart: ^0.71.0
+  intl: ^0.20.2
+  csv: ^6.0.0
+  scrollable_positioned_list: ^0.3.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/icon.png
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icon.png
+    - assets/back.jpg
+    - assets/comb_df_2025-04-18.json
+    - assets/hourly_comb_0_2025-04-23.json
+    - assets/historic.csv
+    - assets/funding/f1.jpg
+    - assets/funding/f2.jpg
+    - assets/funding/f3.jpg
+    - assets/funding/f4.jpg
+
+  fonts:
+    - family: CustomFont
+      fonts:
+        - asset: assets/font.ttf
