@@ -4,10 +4,31 @@ import 'package:flutter/material.dart';
 import './tables/fury_historic_daily.dart';
 import './tables/fury_historic_monthly.dart';
 import './tables/fury_historic_weekly.dart';
-import './tables/teamwise_daily_historic_section.dart';
+import 'dart:ui';
 
-class HistoricHome extends StatelessWidget {
+class HistoricHome extends StatefulWidget {
   const HistoricHome({super.key});
+
+  @override
+  State<HistoricHome> createState() => _HistoricHomeState();
+}
+
+class _HistoricHomeState extends State<HistoricHome> {
+  final ScrollController _mainScrollController = ScrollController();
+  final Map<String, ScrollController> _sectionScrollControllers = {
+    'daily': ScrollController(),
+    'weekly': ScrollController(),
+    'monthly': ScrollController(),
+  };
+
+  @override
+  void dispose() {
+    _mainScrollController.dispose();
+    for (var controller in _sectionScrollControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   // Stylish separator line widget
   Widget separatorLine() {
@@ -31,223 +52,119 @@ class HistoricHome extends StatelessWidget {
     );
   }
 
+  Widget _buildSectionHeader(String title, String sectionKey) {
+    return Container(
+      height: 80,
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: const LinearGradient(
+          colors: [Colors.blueAccent, Colors.purpleAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+        image: const DecorationImage(
+          image: AssetImage('assets/back.jpg'),
+          fit: BoxFit.cover,
+          opacity: 0.7,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(blurRadius: 10, color: Colors.black, offset: Offset(2, 2)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/back.jpg'),
-            fit: BoxFit.cover,
-            opacity: 0.45,
+      body: Stack(
+        children: [
+          // Blurred background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/back.jpg',
+              fit: BoxFit.cover,
+              color: Colors.black.withOpacity(0.4),
+              colorBlendMode: BlendMode.darken,
+            ),
           ),
-        ),
-        child: CustomScrollView(
-          slivers: [
-            // Daily Table Section
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Container(
-                    height: 80,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        colors: [Colors.blueAccent, Colors.purpleAccent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.3),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                      image: const DecorationImage(
-                        image: AssetImage('assets/back.jpg'),
-                        fit: BoxFit.cover,
-                        opacity: 0.7,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Daily Historic Data',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 10,
-                              color: Colors.black,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const FuryHistoricDaily(),
-                  separatorLine(), // Separator below Daily section
-                ],
-              ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(color: Colors.black.withOpacity(0.1)),
             ),
-
-            // Weekly Table Section
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Container(
-                    height: 80,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        colors: [Colors.blueAccent, Colors.purpleAccent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.3),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                      image: const DecorationImage(
-                        image: AssetImage('assets/back.jpg'),
-                        fit: BoxFit.cover,
-                        opacity: 0.7,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Weekly Historic Data',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 10,
-                              color: Colors.black,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+          ),
+          // Main content
+          CustomScrollView(
+            controller: _mainScrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildSectionHeader('Daily Historic Data', 'daily'),
+                      const FuryHistoricDaily(),
+                      separatorLine(),
+                    ],
                   ),
-                  const FuryHistoricWeekly(),
-                  separatorLine(), // Separator below Weekly section
-                ],
+                ),
               ),
-            ),
-
-            // Monthly Table Section
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Container(
-                    height: 80,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        colors: [Colors.blueAccent, Colors.purpleAccent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.3),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                      image: const DecorationImage(
-                        image: AssetImage('assets/back.jpg'),
-                        fit: BoxFit.cover,
-                        opacity: 0.7,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Monthly Historic Data',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 10,
-                              color: Colors.black,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildSectionHeader('Weekly Historic Data', 'weekly'),
+                      const FuryHistoricWeekly(),
+                      separatorLine(),
+                    ],
                   ),
-                  const FuryHistoricMonthly(),
-                  separatorLine(), // if you want a separator
-                ],
+                ),
               ),
-            ),
-
-            // Teamwise Daily Historic Data Section
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Container(
-                    height: 80,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        colors: [Colors.purpleAccent, Colors.blueAccent],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.3),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                      image: const DecorationImage(
-                        image: AssetImage('assets/back.jpg'),
-                        fit: BoxFit.cover,
-                        opacity: 0.7,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Teamwise Daily Historic Data',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 10,
-                              color: Colors.black,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _buildSectionHeader('Monthly Historic Data', 'monthly'),
+                      const FuryHistoricMonthly(),
+                    ],
                   ),
-                  const TeamwiseDailyHistoricSection(),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _mainScrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        },
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.arrow_upward),
       ),
     );
   }
