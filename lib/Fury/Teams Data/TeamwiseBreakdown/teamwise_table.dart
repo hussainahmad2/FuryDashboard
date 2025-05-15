@@ -24,12 +24,21 @@ class TeamwiseTable extends StatelessWidget {
     );
   }
 
+  // Helper function to format numbers to two decimal places
+  String formatNumber(dynamic value) {
+    if (value == null) return '-';
+    if (value is int) return value.toString();
+    if (value is double) return value.toStringAsFixed(2);
+    final parsed = double.tryParse(value.toString());
+    if (parsed == null) return value.toString();
+    if (parsed % 1 == 0) return parsed.toInt().toString();
+    return parsed.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     final horizontalController = ScrollController();
     final verticalController = ScrollController();
-
-    print('Show Junior Metrics: $showJuniorMetrics'); // Debug print
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -351,6 +360,24 @@ class TeamwiseTable extends StatelessWidget {
                                 .toString()
                                 .toLowerCase()
                                 .contains('summary');
+                            // Calculate HC, Conversion, Sale Per HC
+                            final hc = teamData.length;
+                            final totalSales =
+                                double.tryParse(
+                                  member['TOTAL SALES']?.toString() ?? '',
+                                ) ??
+                                0.0;
+                            final totalBills =
+                                double.tryParse(
+                                  member['TOTAL BILLS']?.toString() ?? '',
+                                ) ??
+                                0.0;
+                            final conversion =
+                                (totalBills > 0)
+                                    ? (totalSales / totalBills) * 100
+                                    : 0.0;
+                            final salePerHc =
+                                (hc > 0) ? (totalSales / hc) : 0.0;
                             return DataRow(
                               color: MaterialStateProperty.resolveWith<Color?>(
                                 (states) => null,
@@ -358,7 +385,7 @@ class TeamwiseTable extends StatelessWidget {
                               cells: [
                                 DataCell(
                                   Text(
-                                    '${member['TOTAL CALLS'] ?? 0}',
+                                    formatNumber(member['TOTAL CALLS']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -370,7 +397,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['DIRECT CALLS'] ?? 0}',
+                                    formatNumber(member['DIRECT CALLS']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -382,7 +409,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['PCB CALLS'] ?? 0}',
+                                    formatNumber(member['PCB CALLS']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -394,7 +421,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['VERIFIED CALLS'] ?? 0}',
+                                    formatNumber(member['VERIFIED CALLS']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -406,7 +433,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['TOTAL BILLS'] ?? 0}',
+                                    formatNumber(member['TOTAL BILLS']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -418,7 +445,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['TOTAL SALES'] ?? 0}',
+                                    formatNumber(member['TOTAL SALES']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -430,7 +457,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['AP'] ?? 0}',
+                                    formatNumber(member['AP']),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -442,8 +469,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    member['Validations']?.toString() ??
-                                        'Pending',
+                                    member['Validations']?.toString() ?? '-',
                                     style: TextStyle(
                                       color:
                                           member['Validations'] == 'Valid'
@@ -461,7 +487,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    member['HC']?.toString() ?? '-',
+                                    formatNumber(hc),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -473,7 +499,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    member['Conversion']?.toString() ?? '-',
+                                    formatNumber(conversion),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:
@@ -485,7 +511,7 @@ class TeamwiseTable extends StatelessWidget {
                                 ),
                                 DataCell(
                                   Text(
-                                    '${member['SALE PER HC'] ?? 0}',
+                                    formatNumber(salePerHc),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight:

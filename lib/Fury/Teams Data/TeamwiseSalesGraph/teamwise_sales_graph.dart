@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:math';
+import 'teamwise_sales_table.dart';
 
 class TeamSalesScreen extends StatefulWidget {
   const TeamSalesScreen({super.key});
@@ -15,6 +16,14 @@ class TeamSalesScreen extends StatefulWidget {
 class _TeamSalesScreenState extends State<TeamSalesScreen> {
   List<_TeamSalesData> teamSales = [];
   bool showGraph = true;
+  final Map<String, double> salesMap = {};
+  final Map<String, double> billsMap = {};
+  final Map<String, Set<String>> agentSetMap = {};
+  final Map<String, double> dtMap = {};
+  final Map<String, double> pcbMap = {};
+  final Map<String, double> platMap = {};
+  final Map<String, double> apMap = {};
+  final Map<String, dynamic> validationsMap = {};
 
   @override
   void initState() {
@@ -24,15 +33,13 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
 
   Future<void> loadTeamSales() async {
     final String jsonString = await rootBundle.loadString(
-      'assets/comb_df_2025-04-18.json',
+      'assets/comb_df_2025-05-13.json',
     );
     final List<dynamic> jsonData = json.decode(jsonString);
 
-    // Sum sales for each team and collect manager, agent count, user groups
-    final Map<String, double> salesMap = {};
+    // Sum sales for each team and collect manager, agent count, user groups, and total bills
     final Map<String, String> managerMap = {};
     final Map<String, Set<String>> userGroupMap = {};
-    final Map<String, Set<String>> agentSetMap = {};
     for (final entry in jsonData) {
       final team = entry['TEAM']?.toString() ?? 'Unknown';
       final sales =
@@ -49,6 +56,33 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
       if (entry['AGENT NAME DIALER'] != null) {
         agentSetMap[team]!.add(entry['AGENT NAME DIALER'].toString());
       }
+      final bills =
+          (entry['TOTAL BILLS'] is num) ? entry['TOTAL BILLS'].toDouble() : 0.0;
+      billsMap[team] = (billsMap[team] ?? 0) + bills;
+      final dt =
+          (entry['DIRECT CALLS'] is num)
+              ? entry['DIRECT CALLS'].toDouble()
+              : 0.0;
+      dtMap[team] = (dtMap[team] ?? 0) + dt;
+      final pcb =
+          (entry['PCB SALES'] is num) ? entry['PCB SALES'].toDouble() : 0.0;
+      pcbMap[team] = (pcbMap[team] ?? 0) + pcb;
+      final plat =
+          (entry['VERIFIED CALLS'] is num)
+              ? entry['VERIFIED CALLS'].toDouble()
+              : 0.0;
+      platMap[team] = (platMap[team] ?? 0) + plat;
+      double ap = 0.0;
+      if (entry['DIRECT AP'] is num) {
+        ap = (entry['DIRECT AP'] as num).toDouble();
+      } else if (entry['DIRECT AP'] is String) {
+        ap = double.tryParse(entry['DIRECT AP']) ?? 0.0;
+      }
+      apMap[team] = (apMap[team] ?? 0) + ap;
+      if (!validationsMap.containsKey(team)) {
+        validationsMap[team] = [];
+      }
+      validationsMap[team].add(entry['Validations']);
     }
 
     // Assign a color/gradient to each team
@@ -94,6 +128,53 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
     final maxValue =
         teamSales.isNotEmpty ? teamSales.map((e) => e.sales).reduce(max) : 1.0;
     final barHeight = 22.0;
+
+    // Prepare teamData for the table here so all maps are in scope
+    final List<Map<String, dynamic>> teamData =
+        teamSales.map((d) {
+          final team = d.team;
+          final totalSales = salesMap[team] ?? 0.0;
+          final totalBills = billsMap[team] ?? 0.0;
+          final hc = agentSetMap[team]?.length ?? 0;
+          final conversion =
+              (totalBills > 0) ? (totalSales / totalBills) * 100 : 0.0;
+          final salesPerHc = (hc > 0) ? (totalSales / hc) : 0.0;
+          final dt = dtMap[team] ?? 0.0;
+          final pcb = pcbMap[team] ?? 0.0;
+          final plat = platMap[team] ?? 0.0;
+          final ap = apMap[team] ?? 0.0;
+          String validations = '-';
+          if (validationsMap[team] is List &&
+              (validationsMap[team] as List).isNotEmpty) {
+            final vals = validationsMap[team] as List;
+            final freq = <dynamic, int>{};
+            for (var v in vals) {
+              if (v == null) continue;
+              freq[v] = (freq[v] ?? 0) + 1;
+            }
+            if (freq.isNotEmpty) {
+              validations =
+                  freq.entries
+                      .reduce((a, b) => a.value >= b.value ? a : b)
+                      .key
+                      .toString();
+            }
+          }
+          return {
+            'AGENT NAME DIALER': team,
+            'TOTAL CALLS': d.sales,
+            'DT': dt,
+            'PCB': pcb,
+            'PLAT': plat,
+            'AP': ap,
+            'Validations': validations,
+            'HC': hc,
+            'Conversion': conversion,
+            'SALE PER HC': salesPerHc,
+            'TOTAL SALES': totalSales,
+            'TOTAL BILLS': totalBills,
+          };
+        }).toList();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -316,61 +397,14 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
                               }).toList(),
                             ],
                           )
-                          : _TeamSalesTable(teamSales: teamSales),
+                          : TeamwiseSalesTable(
+                            teamData: teamData,
+                            teamName: '',
+                          ),
                     ],
                   ),
                 ),
       ),
-    );
-  }
-}
-
-class _TeamSalesTable extends StatelessWidget {
-  final List<_TeamSalesData> teamSales;
-  const _TeamSalesTable({required this.teamSales});
-
-  @override
-  Widget build(BuildContext context) {
-    return DataTable(
-      headingRowColor: MaterialStateProperty.all(Colors.transparent),
-      dataRowColor: MaterialStateProperty.all(Colors.transparent),
-      columns: const [
-        DataColumn(label: SizedBox(width: 20)),
-        DataColumn(label: Text('Team', style: TextStyle(color: Colors.white))),
-        DataColumn(label: Text('Sales', style: TextStyle(color: Colors.white))),
-      ],
-      rows:
-          teamSales
-              .map(
-                (d) => DataRow(
-                  cells: [
-                    DataCell(
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: d.gradient,
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      Text(d.team, style: const TextStyle(color: Colors.white)),
-                    ),
-                    DataCell(
-                      Text(
-                        d.sales.toStringAsFixed(0),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              .toList(),
     );
   }
 }

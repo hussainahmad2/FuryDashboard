@@ -7,12 +7,12 @@ import '../Commissions/commissions_screen.dart';
 import '../Downlines/downlines_screen.dart';
 import '../Easy/easy_screen.dart';
 import '../Funding/funding_home.dart';
-import '../Historic/historic_home.dart';
 import 'Teams Data/TeamwiseBreakdown/teamwise_screen.dart';
 import 'Teams Data/TeamwiseSalesGraph/teamwise_sales_graph.dart';
 import 'widgets/rotating_logo.dart';
 import 'widgets/stat_cards.dart';
 import 'widgets/headers.dart';
+import '../Historic/data_home.dart';
 
 class FuryHome extends StatefulWidget {
   const FuryHome({super.key});
@@ -34,7 +34,7 @@ class _FuryHomeState extends State<FuryHome>
 
   final List<Widget> _screens = [
     const _HomeContent(),
-    const HistoricHome(),
+    const DataHome(),
     const FundingScreen(),
     const CommissionsScreen(),
     const AffiliatesScreen(),
@@ -49,11 +49,7 @@ class _FuryHomeState extends State<FuryHome>
       'icon': Icons.dashboard,
       'subItems': ['Overview', 'Analytics'],
     },
-    {
-      'title': 'Historic',
-      'icon': Icons.history,
-      'subItems': ['Daily', 'Weekly', 'Monthly'],
-    },
+    {'title': 'Historic', 'icon': Icons.storage, 'subItems': []},
     {
       'title': 'Funding',
       'icon': Icons.money,
@@ -214,6 +210,7 @@ class _FuryHomeState extends State<FuryHome>
               ),
               child: Stack(
                 children: [
+                  // ===================== TOP HEADER START =====================
                   // Top bar background
                   Positioned(
                     top: 0,
@@ -221,7 +218,9 @@ class _FuryHomeState extends State<FuryHome>
                     right: 0,
                     child: Container(
                       height: 68,
-                      color: Colors.black.withOpacity(0.18),
+                      color:
+                          Colors
+                              .black26, // Less black for header (changed from black38)
                     ),
                   ),
                   // Top Left Menu Icon
@@ -266,6 +265,7 @@ class _FuryHomeState extends State<FuryHome>
                       ],
                     ),
                   ),
+                  // ===================== TOP HEADER END =====================
                   // Main Content Area
                   Positioned.fill(
                     child: GestureDetector(

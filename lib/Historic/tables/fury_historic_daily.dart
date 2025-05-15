@@ -245,7 +245,7 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
       });
 
       setState(() {
-        processedData = result.take(20).toList();
+        processedData = result;
         teamwiseDailyData = grouped;
         isLoading = false;
       });
@@ -306,7 +306,10 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              showTeamwiseTable ? Colors.grey : Colors.blue,
+                              showTeamwiseTable
+                                  ? Colors.grey[700]
+                                  : Colors.blueAccent,
+                          side: BorderSide(color: Colors.white24, width: 2),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -330,7 +333,10 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              showTeamwiseTable ? Colors.blue : Colors.grey,
+                              showTeamwiseTable
+                                  ? Colors.blueAccent
+                                  : Colors.grey[700],
+                          side: BorderSide(color: Colors.white24, width: 2),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
                             vertical: 12,
@@ -435,140 +441,165 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
                                 _buildTableHeader("GI%", width: 50),
                               ],
                             ),
-                            ...processedData
-                                .map(
-                                  (row) => Row(
-                                    children: [
-                                      _buildTableCell(
-                                        row['HC']?.toString() ?? '-',
-                                        width: 50,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Total Calls']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Raw Calls']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Plat Calls']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['PCB']),
-                                        width: 50,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Total Bills']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Plat Bills']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Valid']),
-                                        width: 50,
-                                      ),
-                                      _buildTableCell(
-                                        _formatPercentage(row['VD %']),
-                                        width: 50,
-                                        isPercentage: true,
-                                      ),
-                                      _buildTableCell(
-                                        _formatPercentage(
-                                          row['Blended Conv %'],
-                                        ),
-                                        width: 80,
-                                        isPercentage: true,
-                                      ),
-                                      _buildTableCell(
-                                        _formatPercentage(row['RC Conv %']),
-                                        width: 80,
-                                        isPercentage: true,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Total Sales']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Plat Sales']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Raw Call Sales']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatPercentage(
-                                          row['Blended Sale Conv'],
-                                        ),
-                                        width: 80,
-                                        isPercentage: true,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['RC / Sale']),
-                                        width: 75,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['AP']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['MP']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['AP / Rep']),
-                                        width: 75,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['AP / Sale']),
-                                        width: 75,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Plat AP']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Level AP']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Level']),
-                                        width: 50,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['GI']),
-                                        width: 50,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Grad/Mod']),
-                                        width: 70,
-                                      ),
-                                      _buildTableCell(
-                                        _formatPercentage(row['Plat Bill %']),
-                                        width: 80,
-                                        isPercentage: true,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Bill / Rep']),
-                                        width: 75,
-                                      ),
-                                      _buildTableCell(
-                                        _formatNumber(row['Sale / Rep']),
-                                        width: 75,
-                                      ),
-                                      _buildTableCell(
-                                        _formatPercentage(row['GI %']),
-                                        width: 50,
-                                        isPercentage: true,
-                                      ),
-                                    ],
+                            ...processedData.asMap().entries.map((entry) {
+                              final rowIndex = entry.key;
+                              final row = entry.value;
+                              return Row(
+                                children: [
+                                  _buildTableCell(
+                                    row['HC']?.toString() ?? '-',
+                                    width: 50,
+                                    rowIndex: rowIndex,
                                   ),
-                                )
-                                .toList(),
+                                  _buildTableCell(
+                                    _formatNumber(row['Total Calls']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Raw Calls']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Plat Calls']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['PCB']),
+                                    width: 50,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Total Bills']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Plat Bills']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Valid']),
+                                    width: 50,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatPercentage(row['VD%']),
+                                    width: 50,
+                                    isPercentage: true,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatPercentage(row['Blended Conv %']),
+                                    width: 80,
+                                    isPercentage: true,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatPercentage(row['RC Conv %']),
+                                    width: 80,
+                                    isPercentage: true,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Total Sales']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Plat Sales']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Raw Call Sales']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatPercentage(row['Blended Sale Conv']),
+                                    width: 80,
+                                    isPercentage: true,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['RC / Sale']),
+                                    width: 75,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['AP']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['MP']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['AP / Rep']),
+                                    width: 75,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['AP / Sale']),
+                                    width: 75,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Plat AP']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Level AP']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Level']),
+                                    width: 50,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['GI']),
+                                    width: 50,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Grad/Mod']),
+                                    width: 70,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatPercentage(row['Plat Bill %']),
+                                    width: 80,
+                                    isPercentage: true,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Bill / Rep']),
+                                    width: 75,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatNumber(row['Sale / Rep']),
+                                    width: 75,
+                                    rowIndex: rowIndex,
+                                  ),
+                                  _buildTableCell(
+                                    _formatPercentage(row['GI %']),
+                                    width: 50,
+                                    isPercentage: true,
+                                    rowIndex: rowIndex,
+                                  ),
+                                ],
+                              );
+                            }).toList(),
                           ],
                         ),
                       ),
@@ -652,7 +683,9 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
                     ],
                   ),
                   // Data Rows
-                  ...data.map((row) {
+                  ...data.asMap().entries.map((entry) {
+                    final rowIndex = entry.key;
+                    final row = entry.value;
                     final totalCalls = toNumber(row['Total_Calls']) ?? 0;
                     final directCalls = toNumber(row['Direct_Calls']) ?? 0;
                     final verifiedCalls = toNumber(row['verified_calls']) ?? 0;
@@ -680,20 +713,20 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
                             : 0;
                     final rcConvPercent =
                         directCalls > 0 ? (directSales / directCalls * 100) : 0;
-                    final blendedSaleConv =
+                    final blendedSalePercent =
                         totalBills > 0 ? (sales / totalBills * 100) : 0;
-                    final rcPerSale =
+                    final rcSale =
                         directCalls > 0 ? (directSales / directCalls) : 0;
                     final mp = tPremiumE / 12;
-                    final apPerRep = tPremiumE;
-                    final apPerSale = sales > 0 ? (tPremiumE / sales) : 0;
+                    final apRep = tPremiumE;
+                    final apSale = sales > 0 ? (tPremiumE / sales) : 0;
                     final gradMod = graded + modified + standard + rop;
                     final platBillPercent =
                         verifiedCalls > 0
                             ? (verifiedBills / verifiedCalls * 100)
                             : 0;
-                    final billPerRep = totalBills;
-                    final salePerRep = sales;
+                    final billRep = totalBills;
+                    final saleRep = sales;
                     final giPercent = gi;
 
                     return Row(
@@ -701,64 +734,153 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
                         _buildTableCell(
                           row['Stat Date']?.toString().split(' ')[0] ?? '-',
                           width: 100,
+                          rowIndex: rowIndex,
                         ),
-                        _buildTableCell(_formatNumber(totalCalls), width: 70),
-                        _buildTableCell(_formatNumber(directCalls), width: 70),
+                        _buildTableCell(
+                          _formatNumber(totalCalls),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(directCalls),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
                         _buildTableCell(
                           _formatNumber(verifiedCalls),
                           width: 70,
+                          rowIndex: rowIndex,
                         ),
-                        _buildTableCell(_formatNumber(pcb), width: 50),
-                        _buildTableCell(_formatNumber(totalBills), width: 70),
+                        _buildTableCell(
+                          _formatNumber(pcb),
+                          width: 50,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(totalBills),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
                         _buildTableCell(
                           _formatNumber(verifiedBills),
                           width: 70,
+                          rowIndex: rowIndex,
                         ),
-                        _buildTableCell(_formatNumber(validations), width: 50),
+                        _buildTableCell(
+                          _formatNumber(validations),
+                          width: 50,
+                          rowIndex: rowIndex,
+                        ),
                         _buildTableCell(
                           _formatPercentage(vdPercent),
                           width: 50,
                           isPercentage: true,
+                          rowIndex: rowIndex,
                         ),
                         _buildTableCell(
                           _formatPercentage(blendedConvPercent),
                           width: 80,
                           isPercentage: true,
+                          rowIndex: rowIndex,
                         ),
                         _buildTableCell(
                           _formatPercentage(rcConvPercent),
                           width: 80,
                           isPercentage: true,
+                          rowIndex: rowIndex,
                         ),
-                        _buildTableCell(_formatNumber(sales), width: 70),
-                        _buildTableCell(_formatNumber(platSales), width: 70),
-                        _buildTableCell(_formatNumber(directSales), width: 70),
                         _buildTableCell(
-                          _formatPercentage(blendedSaleConv),
+                          _formatNumber(sales),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(platSales),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(directSales),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatPercentage(blendedSalePercent),
                           width: 80,
                           isPercentage: true,
+                          rowIndex: rowIndex,
                         ),
-                        _buildTableCell(_formatNumber(rcPerSale), width: 75),
-                        _buildTableCell(_formatNumber(tPremiumE), width: 70),
-                        _buildTableCell(_formatNumber(mp), width: 70),
-                        _buildTableCell(_formatNumber(apPerRep), width: 75),
-                        _buildTableCell(_formatNumber(apPerSale), width: 75),
-                        _buildTableCell(_formatNumber(platAp), width: 70),
-                        _buildTableCell(_formatNumber(levelPremium), width: 70),
-                        _buildTableCell(_formatNumber(row['Level']), width: 50),
-                        _buildTableCell(_formatNumber(gi), width: 50),
-                        _buildTableCell(_formatNumber(gradMod), width: 70),
+                        _buildTableCell(
+                          _formatNumber(rcSale),
+                          width: 75,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(tPremiumE),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(mp),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(apRep),
+                          width: 75,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(apSale),
+                          width: 75,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(platAp),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(levelPremium),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(row['Level']),
+                          width: 50,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(gi),
+                          width: 50,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(gradMod),
+                          width: 70,
+                          rowIndex: rowIndex,
+                        ),
                         _buildTableCell(
                           _formatPercentage(platBillPercent),
                           width: 80,
                           isPercentage: true,
+                          rowIndex: rowIndex,
                         ),
-                        _buildTableCell(_formatNumber(billPerRep), width: 75),
-                        _buildTableCell(_formatNumber(salePerRep), width: 75),
+                        _buildTableCell(
+                          _formatNumber(billRep),
+                          width: 75,
+                          rowIndex: rowIndex,
+                        ),
+                        _buildTableCell(
+                          _formatNumber(saleRep),
+                          width: 75,
+                          rowIndex: rowIndex,
+                        ),
                         _buildTableCell(
                           _formatPercentage(giPercent),
                           width: 50,
                           isPercentage: true,
+                          rowIndex: rowIndex,
                         ),
                       ],
                     );
@@ -801,13 +923,16 @@ class _FuryHistoricDailyState extends State<FuryHistoricDaily> {
     String text, {
     double width = 80,
     bool isPercentage = false,
+    int? rowIndex,
   }) {
+    final Color evenRow = Colors.black.withOpacity(0.6);
+    final Color oddRow = Colors.grey[900]!;
     return Container(
       width: width,
       height: 42,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: (rowIndex != null && rowIndex % 2 == 1) ? oddRow : evenRow,
         border: Border(
           bottom: BorderSide(color: Colors.white24),
           right: BorderSide(color: Colors.white24),

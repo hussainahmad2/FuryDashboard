@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class TeamwiseSalesController {
+  static const String salesDataPath = 'assets/comb_df_2025-05-13.json';
+
   Future<(List<String>, List<double>)> loadChartData() async {
     try {
-      final response = await rootBundle.loadString(
-        'assets/comb_df_2025-04-18.json',
-      );
+      final response = await rootBundle.loadString(salesDataPath);
       final data = json.decode(response) as List<dynamic>;
 
       final salesMap = <String, double>{};

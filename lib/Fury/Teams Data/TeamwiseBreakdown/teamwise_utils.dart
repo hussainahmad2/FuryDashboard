@@ -17,10 +17,10 @@ final Map<int, String> timeSlots = {
   11: "4:00AM-5:00AM",
 };
 
+const String teamwiseDataPath = 'assets/comb_df_2025-05-13.json';
+
 Future<List<Map<String, dynamic>>> loadTeamwiseJsonData() async {
-  final String response = await rootBundle.loadString(
-    'assets/comb_df_2025-04-18.json',
-  );
+  final String response = await rootBundle.loadString(teamwiseDataPath);
   final List<dynamic> jsonData = json.decode(response);
   return List<Map<String, dynamic>>.from(jsonData);
 }

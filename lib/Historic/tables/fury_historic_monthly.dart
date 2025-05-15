@@ -63,10 +63,9 @@ class _FuryHistoricMonthlyState extends State<FuryHistoricMonthly> {
   int _countUniqueTeamMembers(List<Map<String, dynamic>> dailyData) {
     Set<String> uniqueMembers = {};
     for (var day in dailyData) {
-      if (day['Agent ID'] != null) {
-        uniqueMembers.add(day['Agent ID'].toString());
-      } else if (day['Team Member'] != null) {
-        uniqueMembers.add(day['Team Member'].toString());
+      final name = day['Closer_Name']?.toString();
+      if (name != null && name.isNotEmpty) {
+        uniqueMembers.add(name);
       }
     }
     return uniqueMembers.length;
@@ -115,7 +114,7 @@ class _FuryHistoricMonthlyState extends State<FuryHistoricMonthly> {
       List<Map<String, dynamic>> result = [];
       monthlyGroups.forEach((monthKey, dailyData) {
         try {
-          // Calculate unique team members (HC)
+          // Calculate unique team members (HC) for the whole month
           int hc = _countUniqueTeamMembers(dailyData);
 
           // Calculate all sums

@@ -33,7 +33,7 @@ flutter:
   assets:
     - assets/icon.png
     - assets/back.jpg
-    - assets/comb_df_2025-04-18.json
+    - assets/comb_df_2025-05-13.json
     - assets/hourly_comb_0_2025-04-23.json
     - assets/historic.csv
     - assets/funding/f1.jpg

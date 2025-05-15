@@ -25,6 +25,17 @@ class TeamwiseHourlyTable extends StatelessWidget {
     );
   }
 
+  // Helper function to format numbers to two decimal places
+  String formatNumber(dynamic value) {
+    if (value == null) return '-';
+    if (value is int) return value.toString();
+    if (value is double) return value.toStringAsFixed(2);
+    final parsed = double.tryParse(value.toString());
+    if (parsed == null) return value.toString();
+    if (parsed % 1 == 0) return parsed.toInt().toString();
+    return parsed.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     final horizontalController = ScrollController();
@@ -141,7 +152,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                           ),
                           border: TableBorder.all(color: Colors.white24),
                           columns: [
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Calls',
                                 style: TextStyle(
@@ -151,7 +162,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'DT',
                                 style: TextStyle(
@@ -161,7 +172,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'PCB',
                                 style: TextStyle(
@@ -171,7 +182,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Plat',
                                 style: TextStyle(
@@ -181,7 +192,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Bills',
                                 style: TextStyle(
@@ -191,7 +202,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Sales',
                                 style: TextStyle(
@@ -201,7 +212,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'AP',
                                 style: TextStyle(
@@ -211,7 +222,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Validations',
                                 style: TextStyle(
@@ -221,7 +232,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'HC',
                                 style: TextStyle(
@@ -231,7 +242,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Conversion',
                                 style: TextStyle(
@@ -241,7 +252,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            DataColumn(
+                            const DataColumn(
                               label: Text(
                                 'Sale Per HC',
                                 style: TextStyle(
@@ -368,7 +379,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                   cells: [
                                     DataCell(
                                       Text(
-                                        '${member['TOTAL CALLS'] ?? 0}',
+                                        formatNumber(member['TOTAL CALLS']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -380,7 +391,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        '${member['DIRECT CALLS'] ?? 0}',
+                                        formatNumber(member['DIRECT CALLS']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -392,7 +403,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        '${member['PCB CALLS'] ?? 0}',
+                                        formatNumber(member['PCB CALLS']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -404,7 +415,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        '${member['VERIFIED CALLS'] ?? 0}',
+                                        formatNumber(member['VERIFIED CALLS']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -416,7 +427,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        '${member['TOTAL BILLS'] ?? 0}',
+                                        formatNumber(member['TOTAL BILLS']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -428,7 +439,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        '${member['TOTAL SALES'] ?? 0}',
+                                        formatNumber(member['TOTAL SALES']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -440,7 +451,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        '${member['AP'] ?? 0}',
+                                        formatNumber(member['AP']),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -471,7 +482,7 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        member['HC']?.toString() ?? '-',
+                                        formatNumber(teamData.length),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -483,7 +494,29 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        member['Conversion']?.toString() ?? '-',
+                                        formatNumber(
+                                          (double.tryParse(
+                                                    member['TOTAL SALES']
+                                                            ?.toString() ??
+                                                        '',
+                                                  ) ??
+                                                  0.0) /
+                                              ((double.tryParse(
+                                                            member['TOTAL BILLS']
+                                                                    ?.toString() ??
+                                                                '',
+                                                          ) ??
+                                                          0.0) ==
+                                                      0
+                                                  ? 1
+                                                  : double.tryParse(
+                                                        member['TOTAL BILLS']
+                                                                ?.toString() ??
+                                                            '',
+                                                      ) ??
+                                                      1) *
+                                              100,
+                                        ),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
@@ -495,8 +528,17 @@ class TeamwiseHourlyTable extends StatelessWidget {
                                     ),
                                     DataCell(
                                       Text(
-                                        member['Sale Per HC']?.toString() ??
-                                            '-',
+                                        formatNumber(
+                                          (double.tryParse(
+                                                    member['TOTAL SALES']
+                                                            ?.toString() ??
+                                                        '',
+                                                  ) ??
+                                                  0.0) /
+                                              (teamData.length == 0
+                                                  ? 1
+                                                  : teamData.length),
+                                        ),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontWeight:
