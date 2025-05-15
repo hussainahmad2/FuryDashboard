@@ -13,6 +13,8 @@ import 'widgets/rotating_logo.dart';
 import 'widgets/stat_cards.dart';
 import 'widgets/headers.dart';
 import '../Historic/data_home.dart';
+import '../utils/responsive_utils.dart';
+import '../utils/orientation_aware_widget.dart';
 
 class FuryHome extends StatefulWidget {
   const FuryHome({super.key});
@@ -190,179 +192,176 @@ class _FuryHomeState extends State<FuryHome>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isPortrait = constraints.maxHeight > constraints.maxWidth;
-        final isSmallScreen = constraints.maxWidth < 600;
+    return OrientationAwareWidget(
+      builder: (context, isPortrait, isSmallScreen) {
+        final headerHeight = isSmallScreen ? 60.0 : 68.0;
+        final sidebarWidth = isSmallScreen ? 240.0 : 280.0;
 
         return Scaffold(
-          body: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/back.jpg'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black54,
-                    BlendMode.darken,
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/back.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Top bar background
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(height: headerHeight, color: Colors.black26),
+                ),
+                // Top Left Menu Icon
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: IconButton(
+                    key: _menuButtonKey,
+                    icon: Icon(
+                      Icons.menu,
+                      size: isSmallScreen ? 24 : 28,
+                      color: Colors.white,
+                    ),
+                    onPressed: _toggleSidebar,
+                    padding: const EdgeInsets.all(8),
                   ),
                 ),
-              ),
-              child: Stack(
-                children: [
-                  // ===================== TOP HEADER START =====================
-                  // Top bar background
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 68,
-                      color:
-                          Colors
-                              .black26, // Less black for header (changed from black38)
-                    ),
+                // Logo at top right
+                Positioned(
+                  top: 8,
+                  right: 16,
+                  child: RotatingLogo(
+                    imagePath: 'assets/icon.png',
+                    size: isSmallScreen ? 36 : 44,
                   ),
-                  // Top Left Menu Icon
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: IconButton(
-                      key: _menuButtonKey,
-                      icon: const Icon(
-                        Icons.menu,
-                        size: 32,
-                        color: Colors.white,
-                      ),
-                      onPressed: _toggleSidebar,
-                      padding: const EdgeInsets.all(8),
-                    ),
-                  ),
-                  // Logo at top right
-                  Positioned(
-                    top: 8,
-                    right: 16,
-                    child: RotatingLogo(imagePath: 'assets/icon.png', size: 44),
-                  ),
-                  // Top Center Heading
-                  Positioned(
-                    top: 16,
-                    left: 0,
-                    right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _menuItems[_selectedIndex]['title'] + ' Dashboard',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                ),
+                // Top Center Heading
+                Positioned(
+                  top: 16,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _menuItems[_selectedIndex]['title'] + ' Dashboard',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ResponsiveUtils.getFontSize(
+                            context,
+                            base: 22.0,
+                            scaleFactor: isSmallScreen ? 0.8 : 1.0,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
-                      ],
-                    ),
-                  ),
-                  // ===================== TOP HEADER END =====================
-                  // Main Content Area
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (_showSidebar) {
-                          _toggleSidebar();
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 60),
-                        child: _screens[_selectedIndex],
+                        overflow: TextOverflow.ellipsis,
                       ),
+                    ],
+                  ),
+                ),
+                // Main Content Area
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_showSidebar) {
+                        _toggleSidebar();
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(top: headerHeight),
+                      child: _screens[_selectedIndex],
                     ),
                   ),
-                  // Sidebar overlay
-                  if (_showSidebar)
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: 240,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.92),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              spreadRadius: 2,
+                ),
+                // Sidebar overlay
+                if (_showSidebar)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: sidebarWidth,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.92),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          // Sidebar Logo and Title
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 16 : 24,
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            // Sidebar Logo and Title
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 24),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    width: 1,
-                                  ),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  width: 1,
                                 ),
                               ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 80,
-                                    width: 80,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 8,
-                                          spreadRadius: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const RotatingLogo(),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    'Fury Dashboard',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ),
-                            // Navigation Items
-                            Expanded(
-                              child: ListView(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: isSmallScreen ? 60 : 80,
+                                  width: isSmallScreen ? 60 : 80,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const RotatingLogo(),
                                 ),
-                                children: List.generate(_menuItems.length, (
+                                SizedBox(height: isSmallScreen ? 12 : 16),
+                                Text(
+                                  'Fury Dashboard',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: isSmallScreen ? 18 : 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Navigation Items
+                          Expanded(
+                            child: ListView(
+                              padding: EdgeInsets.symmetric(
+                                vertical: isSmallScreen ? 12 : 16,
+                              ),
+                              children: List.generate(_menuItems.length, (
+                                index,
+                              ) {
+                                return _buildNavIcon(
+                                  _menuItems[index]['icon'],
                                   index,
-                                ) {
-                                  return _buildNavIcon(
-                                    _menuItems[index]['icon'],
-                                    index,
-                                    _menuItems[index]['title'],
-                                  );
-                                }),
-                              ),
+                                  _menuItems[index]['title'],
+                                );
+                              }),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
           ),
         );
@@ -385,7 +384,7 @@ class _FuryHomeState extends State<FuryHome>
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
           decoration: BoxDecoration(
             color:
                 isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
@@ -414,11 +413,11 @@ class _FuryHomeState extends State<FuryHome>
                   child: Icon(
                     icon,
                     color: isSelected ? Colors.blue : Colors.grey[400],
-                    size: 24,
+                    size: 22,
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
@@ -444,21 +443,23 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isPortrait = constraints.maxHeight > constraints.maxWidth;
-        final isSmallScreen = constraints.maxWidth < 600;
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        final isPortrait = orientation == Orientation.portrait;
+        final size = MediaQuery.of(context).size;
+        final isSmallScreen = size.width < 600;
+        final padding = isSmallScreen ? 16.0 : 24.0;
 
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(padding),
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16), // Add extra spacing at the top
+                    const SizedBox(height: 16),
                     const TodayHeader(),
                     const SizedBox(height: 24),
                     const SizedBox(height: 16),
@@ -473,7 +474,10 @@ class _HomeContent extends StatelessWidget {
                       elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
-                        child: SizedBox(height: 320, child: TeamSalesScreen()),
+                        child: SizedBox(
+                          height: isPortrait ? 320 : 260,
+                          child: TeamSalesScreen(),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 32),

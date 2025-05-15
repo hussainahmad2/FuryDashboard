@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import '../../utils/responsive_utils.dart';
+import '../../utils/orientation_aware_widget.dart';
 
 class StatCards extends StatefulWidget {
   const StatCards({super.key});
@@ -142,6 +144,9 @@ class _StatCardsState extends State<StatCards> {
     Color color,
     String description,
   ) {
+    final isSmallScreen = ResponsiveUtils.isSmallScreen(context);
+    final size = MediaQuery.of(context).size;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -152,7 +157,8 @@ class _StatCardsState extends State<StatCards> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           child: Container(
-            padding: const EdgeInsets.all(20),
+            width: isSmallScreen ? size.width * 0.9 : 400,
+            padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
             decoration: BoxDecoration(
               color: const Color(0xFF1E1E1E),
               borderRadius: BorderRadius.circular(16),
@@ -171,18 +177,19 @@ class _StatCardsState extends State<StatCards> {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: isSmallScreen ? 20 : 24,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         value,
                         style: TextStyle(
                           color: color,
-                          fontSize: 32,
+                          fontSize: isSmallScreen ? 28 : 32,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -192,7 +199,10 @@ class _StatCardsState extends State<StatCards> {
                 const SizedBox(height: 20),
                 Text(
                   description,
-                  style: const TextStyle(color: Colors.white70, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: isSmallScreen ? 14 : 16,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -204,6 +214,51 @@ class _StatCardsState extends State<StatCards> {
                   ),
                 ),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ... existing imports and class definition ...
+
+  @override
+  Widget build(BuildContext context) {
+    return OrientationAwareWidget(
+      builder: (context, isPortrait, isSmallScreen) {
+        final cardData = getCardData();
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 400,
+            ), // Keeps grid compact
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2, // Keeps cards square-ish
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children:
+                  cardData.map((data) {
+                    final title = data[0] as String;
+                    final value = data[1] as String;
+                    final color = data[2] as Color;
+                    final description = data[3] as String;
+                    return GestureDetector(
+                      onTap:
+                          () => _showStatDetails(
+                            context,
+                            title,
+                            value,
+                            color,
+                            description,
+                          ),
+                      child: _buildCard(title, value, color),
+                    );
+                  }).toList(),
             ),
           ),
         );
@@ -233,88 +288,33 @@ class _StatCardsState extends State<StatCards> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 4,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: BorderRadius.circular(8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        value,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: accentColor,
-                          letterSpacing: 0.5,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                const SizedBox(height: 8),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cardData = getCardData();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: GridView.count(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 2.8,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        children:
-            cardData.map((data) {
-              final title = data[0] as String;
-              final value = data[1] as String;
-              final color = data[2] as Color;
-              final description = data[3] as String;
-              return GestureDetector(
-                onTap:
-                    () => _showStatDetails(
-                      context,
-                      title,
-                      value,
-                      color,
-                      description,
-                    ),
-                child: _buildCard(title, value, color),
-              );
-            }).toList(),
       ),
     );
   }
