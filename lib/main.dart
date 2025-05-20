@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Fury/fury_main_home.dart';
 import 'utils/safe_area_wrapper.dart';
+import 'login.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   // Enable all orientations
   SystemChrome.setPreferredOrientations([
@@ -53,7 +55,7 @@ class MyApp extends StatelessWidget {
           child: SafeAreaWrapper(child: child!),
         );
       },
-      home: const FuryHome(),
+      home: const LoginScreen(),
     );
   }
 }

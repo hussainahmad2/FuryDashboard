@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "726141419056",
+    "project_id": "fury-dashboard",
+    "storage_bucket": "fury-dashboard.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:726141419056:android:b8baf129e7219fb2cab7f5",
+        "android_client_info": {
+          "package_name": "com.example.fury_dash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5iv4J38nfZq--_NFpA0HVp59Lrawh5T4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
