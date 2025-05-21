@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, unused_field, unused_element, unused_local_variable, prefer_interpolation_to_compose_strings
+// ignore_for_file: deprecated_member_use, unused_field, unused_element, unused_local_variable, prefer_interpolation_to_compose_strings, unnecessary_import
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -455,15 +455,17 @@ class _HomeContent extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverPadding(
-              padding: EdgeInsets.all(padding),
+              padding: EdgeInsets.symmetric(
+                horizontal: padding,
+                vertical: padding,
+              ),
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     const TodayHeader(),
-                    const SizedBox(height: 24),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     const StatCards(),
                     const SizedBox(height: 32),
                     const GraphHeader(),

@@ -67,8 +67,8 @@ class _StatCardsState extends State<StatCards> {
       return [
         ['Direct Tranfers', '...', Colors.red, 'Loading data...'],
         ['Plat', '...', Colors.blue, 'Loading data...'],
-        ['Sales', '...', Colors.green, 'Loading data...'],
-        ['Conversion', '...', Colors.amber, 'Loading data...'],
+        ['Sales Conversion', '...', Colors.green, 'Loading data...'],
+        ['Bills Conversion', '...', Colors.amber, 'Loading data...'],
       ];
     }
 
@@ -114,13 +114,13 @@ class _StatCardsState extends State<StatCards> {
           'Total number of verified platform transactions',
         ],
         [
-          'Sales',
+          'Sales Conversion',
           conversionPercent,
           Colors.green,
           'Sales conversion rate based on total transactions',
         ],
         [
-          'Conversion',
+          'Bills Conversion',
           conversionPercentage,
           Colors.amber,
           'Overall conversion rate based on validations',
@@ -131,8 +131,8 @@ class _StatCardsState extends State<StatCards> {
       return [
         ['Direct Tranfers', '0', Colors.red, 'No data available'],
         ['Plat', '0', Colors.blue, 'No data available'],
-        ['Sales', '0%', Colors.green, 'No data available'],
-        ['Conversion', '0%', Colors.amber, 'No data available'],
+        ['Sales Conversion', '0%', Colors.green, 'No data available'],
+        ['Bills Conversion', '0%', Colors.amber, 'No data available'],
       ];
     }
   }
@@ -221,8 +221,6 @@ class _StatCardsState extends State<StatCards> {
     );
   }
 
-  // ... existing imports and class definition ...
-
   @override
   Widget build(BuildContext context) {
     return OrientationAwareWidget(
@@ -231,14 +229,12 @@ class _StatCardsState extends State<StatCards> {
 
         return Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 400,
-            ), // Keeps grid compact
+            constraints: const BoxConstraints(maxWidth: 400),
             child: GridView.count(
               crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 1.2, // Keeps cards square-ish
+              childAspectRatio: 1.2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children:
@@ -247,6 +243,10 @@ class _StatCardsState extends State<StatCards> {
                     final value = data[1] as String;
                     final color = data[2] as Color;
                     final description = data[3] as String;
+
+                    // Define gradient colors based on the card type
+                    final gradientColors = _getGradientColors(color);
+
                     return GestureDetector(
                       onTap:
                           () => _showStatDetails(
@@ -256,7 +256,85 @@ class _StatCardsState extends State<StatCards> {
                             color,
                             description,
                           ),
-                      child: _buildCard(title, value, color),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: gradientColors,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Icon(
+                                    _getIconForTitle(title),
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      'Live',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    title,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white.withOpacity(0.9),
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     );
                   }).toList(),
             ),
@@ -266,56 +344,31 @@ class _StatCardsState extends State<StatCards> {
     );
   }
 
-  Widget _buildCard(String title, String value, Color accentColor) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [accentColor.withOpacity(0.18), const Color(0xFF23272F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: accentColor.withOpacity(0.18),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  value,
-                  style: TextStyle(
-                    color: accentColor,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  List<Color> _getGradientColors(Color baseColor) {
+    if (baseColor == Colors.red) {
+      return [const Color(0xFFE53935), const Color(0xFFC62828)];
+    } else if (baseColor == Colors.blue) {
+      return [const Color(0xFF2196F3), const Color(0xFF1976D2)];
+    } else if (baseColor == Colors.green) {
+      return [const Color(0xFF4CAF50), const Color(0xFF2E7D32)];
+    } else if (baseColor == Colors.amber) {
+      return [const Color(0xFFFF9800), const Color(0xFFF57C00)];
+    }
+    return [baseColor, baseColor.withOpacity(0.8)];
+  }
+
+  IconData _getIconForTitle(String title) {
+    switch (title) {
+      case 'Direct Tranfers':
+        return Icons.swap_horiz;
+      case 'Plat':
+        return Icons.computer;
+      case 'Sales Conversion':
+        return Icons.trending_up;
+      case 'Bills Conversion':
+        return Icons.percent;
+      default:
+        return Icons.info;
+    }
   }
 }

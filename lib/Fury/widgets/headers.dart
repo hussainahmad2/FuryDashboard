@@ -9,7 +9,8 @@ class TodayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 80,
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
@@ -54,7 +55,8 @@ class GraphHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 80,
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
@@ -99,7 +101,8 @@ class BreakdownHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 80,
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(

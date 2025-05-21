@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../utils/orientation_aware_widget.dart';
 
-class TeamwiseSalesTable extends StatelessWidget {
+class TeamwiseSalesTable extends StatefulWidget {
   final List<Map<String, dynamic>> teamData;
   final String teamName;
 
@@ -15,56 +15,42 @@ class TeamwiseSalesTable extends StatelessWidget {
   });
 
   @override
+  State<TeamwiseSalesTable> createState() => _TeamwiseSalesTableState();
+}
+
+class _TeamwiseSalesTableState extends State<TeamwiseSalesTable> {
+  static const double cellWidth = 90.0;
+  static const double cellHeight = 42.0;
+
+  @override
   Widget build(BuildContext context) {
     return OrientationAwareWidget(
       builder: (context, isPortrait, isSmallScreen) {
-        final horizontalController = ScrollController();
-        final verticalController = ScrollController();
+        final fontSize = ResponsiveUtils.getFontSize(context, base: 13.0);
+        final headerFontSize = ResponsiveUtils.getFontSize(context, base: 13.0);
 
-        final nameColumnWidth = isSmallScreen ? 100.0 : 150.0;
-        final tableHeight = ResponsiveUtils.getResponsiveHeight(
-          context,
-          portrait: 300,
-          landscape: 240,
-        );
-        final fontSize = ResponsiveUtils.getFontSize(context, base: 15.0);
-        final headerFontSize = ResponsiveUtils.getFontSize(context, base: 16.0);
-        final rowHeight = isSmallScreen ? 40.0 : 56.0;
-        final columnSpacing = isSmallScreen ? 8.0 : 20.0;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: tableHeight,
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  // Synchronize vertical scrolling between fixed column and scrollable columns
-                  if (scrollInfo.depth == 0 &&
-                      scrollInfo is ScrollUpdateNotification &&
-                      scrollInfo.metrics.axis == Axis.vertical) {
-                    verticalController.jumpTo(scrollInfo.metrics.pixels);
-                  }
-                  return false;
-                },
+        return Container(
+          height: 400,
+          decoration: const BoxDecoration(color: Colors.black87),
+          child: Column(
+            children: [
+              // Table Content
+              Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Fixed Name column
+                    // Fixed Name Column
                     SizedBox(
-                      width: nameColumnWidth,
+                      width: 120,
                       child: SingleChildScrollView(
-                        controller: verticalController,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Header
                             Container(
-                              height: rowHeight,
+                              height: cellHeight,
+                              alignment: Alignment.centerLeft,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
                               ),
-                              alignment: Alignment.centerLeft,
                               decoration: const BoxDecoration(
                                 color: Colors.black,
                                 border: Border(
@@ -84,21 +70,19 @@ class TeamwiseSalesTable extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            // Data rows
-                            ...teamData.map((member) {
+                            ...widget.teamData.map((member) {
                               final isSummary = (member['AGENT NAME DIALER'] ??
                                       '')
                                   .toString()
                                   .toLowerCase()
                                   .contains('summary');
                               return Container(
-                                height: rowHeight,
+                                height: cellHeight,
+                                alignment: Alignment.centerLeft,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                 ),
-                                alignment: Alignment.centerLeft,
                                 decoration: const BoxDecoration(
-                                  color: Colors.transparent,
                                   border: Border(
                                     bottom: BorderSide(color: Colors.white24),
                                     right: BorderSide(color: Colors.white24),
@@ -117,307 +101,160 @@ class TeamwiseSalesTable extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               );
-                            }),
+                            }).toList(),
                           ],
                         ),
                       ),
                     ),
-                    // Scrollable columns
+                    // Scrollable Data Columns
                     Expanded(
                       child: SingleChildScrollView(
-                        controller: horizontalController,
                         scrollDirection: Axis.horizontal,
                         child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: DataTable(
-                            columnSpacing: columnSpacing,
-                            headingRowHeight: rowHeight,
-                            dataRowMinHeight: rowHeight,
-                            dataRowMaxHeight: rowHeight,
-                            headingRowColor: WidgetStateColor.resolveWith(
-                              (states) => Colors.black,
-                            ),
-                            dataRowColor: WidgetStateColor.resolveWith(
-                              (states) => Colors.transparent,
-                            ),
-                            border: TableBorder.all(color: Colors.white24),
-                            columns: const [
-                              DataColumn(
-                                label: Text(
-                                  'Calls',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Headers
+                              Container(
+                                height: cellHeight,
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: Colors.pinkAccent,
+                                      width: 2,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'DT',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
+                                child: Row(
+                                  children: [
+                                    _buildHeader(
+                                      'Calls',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'DT',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'PCB',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'Plat',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'Bills',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'Sales',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'AP',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'Validations',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'HC',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'Conversion',
+                                      fontSize: headerFontSize,
+                                    ),
+                                    _buildHeader(
+                                      'Sales Per HC',
+                                      fontSize: headerFontSize,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              DataColumn(
-                                label: Text(
-                                  'PCB',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                              // Data Rows
+                              ...widget.teamData.map((member) {
+                                final isSummary =
+                                    (member['AGENT NAME DIALER'] ?? '')
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains('summary');
+                                return Container(
+                                  height: cellHeight,
+                                  decoration: const BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(color: Colors.white24),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Plat',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Bills',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Sales',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'AP',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Validations',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'HC',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Conversion',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Sales Per HC',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            rows:
-                                teamData.map((member) {
-                                  final isSummary =
-                                      (member['AGENT NAME DIALER'] ?? '')
-                                          .toString()
-                                          .toLowerCase()
-                                          .contains('summary');
-                                  return DataRow(
-                                    color: MaterialStateProperty.resolveWith<
-                                      Color?
-                                    >((states) => null),
-                                    cells: [
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['TOTAL CALLS']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
+                                  child: Row(
+                                    children: [
+                                      _buildCell(
+                                        formatNumber(member['TOTAL CALLS']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        formatNumber(member['DT']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        formatNumber(member['PCB']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        formatNumber(member['PLAT']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        formatNumber(member['TOTAL BILLS']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        formatNumber(member['TOTAL SALES']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        formatNumber(member['AP']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                      ),
+                                      _buildCell(
+                                        member['Validations']?.toString() ??
+                                            '-',
+                                        fontSize: fontSize,
+                                        bold: isSummary,
+                                        textColor: _getValidationColor(
+                                          member['Validations'],
                                         ),
                                       ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['DT']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
+                                      _buildCell(
+                                        formatNumber(member['HC']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
                                       ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['PCB']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
+                                      _buildCell(
+                                        formatNumber(member['Conversion']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
                                       ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['PLAT']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['TOTAL BILLS']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['TOTAL SALES']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['AP']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          member['Validations']?.toString() ??
-                                              '-',
-                                          style: TextStyle(
-                                            color:
-                                                member['Validations'] == 'Valid'
-                                                    ? Colors.green
-                                                    : member['Validations'] ==
-                                                        'Invalid'
-                                                    ? Colors.red
-                                                    : Colors.orange,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['HC']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['Conversion']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          formatNumber(member['SALE PER HC']),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: fontSize,
-                                            fontWeight:
-                                                isSummary
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal,
-                                          ),
-                                        ),
+                                      _buildCell(
+                                        formatNumber(member['SALE PER HC']),
+                                        fontSize: fontSize,
+                                        bold: isSummary,
                                       ),
                                     ],
-                                  );
-                                }).toList(),
+                                  ),
+                                );
+                              }).toList(),
+                            ],
                           ),
                         ),
                       ),
@@ -425,14 +262,64 @@ class TeamwiseSalesTable extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
   }
 
-  // Helper function to format numbers to two decimal places
+  Widget _buildHeader(String text, {double fontSize = 13.0}) {
+    return Container(
+      width: cellWidth,
+      height: cellHeight,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        border: Border(right: BorderSide(color: Colors.white24)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: fontSize,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildCell(
+    String text, {
+    bool bold = false,
+    double fontSize = 13.0,
+    Color textColor = Colors.white,
+  }) {
+    return Container(
+      width: cellWidth,
+      height: cellHeight,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        border: Border(right: BorderSide(color: Colors.white24)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+          fontSize: fontSize,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Color _getValidationColor(dynamic value) {
+    if (value == 'Valid') return Colors.green;
+    if (value == 'Invalid') return Colors.red;
+    return Colors.orange;
+  }
+
   String formatNumber(dynamic value) {
     if (value == null) return '-';
     if (value is int) return value.toString();

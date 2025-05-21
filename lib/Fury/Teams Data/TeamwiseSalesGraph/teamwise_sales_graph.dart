@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unnecessary_to_list_in_spreads
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -127,7 +127,7 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
   Widget build(BuildContext context) {
     final maxValue =
         teamSales.isNotEmpty ? teamSales.map((e) => e.sales).reduce(max) : 1.0;
-    final barHeight = 22.0;
+    final barHeight = 12.0;
 
     // Prepare teamData for the table here so all maps are in scope
     final List<Map<String, dynamic>> teamData =
@@ -191,23 +191,25 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Toggle Buttons
-                      Row(
-                        children: [
-                          const SizedBox(width: 8),
-                          _ToggleButton(
-                            text: 'Graph',
-                            selected: showGraph,
-                            onTap: () => setState(() => showGraph = true),
-                          ),
-                          const SizedBox(width: 8),
-                          _ToggleButton(
-                            text: 'Table',
-                            selected: !showGraph,
-                            onTap: () => setState(() => showGraph = false),
-                          ),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 0),
+                        child: Row(
+                          children: [
+                            _ToggleButton(
+                              text: 'Graph',
+                              selected: showGraph,
+                              onTap: () => setState(() => showGraph = true),
+                            ),
+                            const SizedBox(width: 8),
+                            _ToggleButton(
+                              text: 'Table',
+                              selected: !showGraph,
+                              onTap: () => setState(() => showGraph = false),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 24),
                       showGraph
                           ? Column(
                             mainAxisSize: MainAxisSize.min,
@@ -215,7 +217,7 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
                               ...teamSales.map((d) {
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    vertical: 4,
+                                    vertical: 6,
                                   ),
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(12),
@@ -346,40 +348,63 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
                                         Expanded(
                                           child: Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Container(
-                                              height: barHeight,
-                                              width:
-                                                  maxValue == 0
-                                                      ? 0
-                                                      : (d.sales / maxValue) *
-                                                          MediaQuery.of(
-                                                            context,
-                                                          ).size.width *
-                                                          0.35,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                gradient: LinearGradient(
-                                                  colors: d.gradient,
-                                                  begin: Alignment.centerLeft,
-                                                  end: Alignment.centerRight,
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: d.gradient.first
-                                                        .withOpacity(0.13),
-                                                    blurRadius: 6,
-                                                    offset: const Offset(0, 1),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+                                            child:
+                                                d.sales > 0
+                                                    ? Container(
+                                                      height: barHeight,
+                                                      width:
+                                                          maxValue == 0
+                                                              ? 0
+                                                              : (d.sales /
+                                                                          maxValue) *
+                                                                      MediaQuery.of(
+                                                                        context,
+                                                                      ).size.width *
+                                                                      0.7 +
+                                                                  (d.sales / maxValue <
+                                                                          0.1
+                                                                      ? 15
+                                                                      : 0),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              4,
+                                                            ),
+                                                        gradient: LinearGradient(
+                                                          colors: d.gradient,
+                                                          begin:
+                                                              Alignment
+                                                                  .centerLeft,
+                                                          end:
+                                                              Alignment
+                                                                  .centerRight,
+                                                        ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: d
+                                                                .gradient
+                                                                .first
+                                                                .withOpacity(
+                                                                  0.1,
+                                                                ),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                const Offset(
+                                                                  0,
+                                                                  1,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                    : const SizedBox(),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
                                         // Value
-                                        SizedBox(
-                                          width: 32,
+                                        Container(
+                                          width: 60,
+                                          alignment: Alignment.centerRight,
                                           child: Text(
                                             d.sales.toStringAsFixed(0),
                                             style: const TextStyle(
@@ -387,7 +412,6 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
                                               fontWeight: FontWeight.bold,
                                               fontSize: 14,
                                             ),
-                                            textAlign: TextAlign.left,
                                           ),
                                         ),
                                       ],
@@ -397,9 +421,12 @@ class _TeamSalesScreenState extends State<TeamSalesScreen> {
                               }).toList(),
                             ],
                           )
-                          : TeamwiseSalesTable(
-                            teamData: teamData,
-                            teamName: '',
+                          : Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: TeamwiseSalesTable(
+                              teamData: teamData,
+                              teamName: '',
+                            ),
                           ),
                     ],
                   ),

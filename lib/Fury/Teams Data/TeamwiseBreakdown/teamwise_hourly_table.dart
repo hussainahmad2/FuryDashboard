@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, prefer_is_empty
 
 import 'package:flutter/material.dart';
 import 'teamwise_utils.dart';

@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'Fury/fury_main_home.dart';
 import 'utils/safe_area_wrapper.dart';
 import 'login.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -55,7 +58,7 @@ class MyApp extends StatelessWidget {
           child: SafeAreaWrapper(child: child!),
         );
       },
-      home: const LoginScreen(),
+      home: const FuryHome(),
     );
   }
 }
